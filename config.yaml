@@ -1,4 +1,4 @@
-server_ip: "10.230.0.212"
+server_ip: "10.230.0.246"
 
 tftp:
   listen_addr: ":69"
