@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{if .IsEdit}}Edit Client{{else}}New Client{{end}}</title>
+</head>
+<body>
+<h1>{{if .IsEdit}}Edit Client{{else}}New Client{{end}}</h1>
+
+<form method="post" action="{{if .IsEdit}}/admin/clients/edit?id={{.Client.ID}}{{else}}/admin/clients/new{{end}}">
+    <p>
+        <label>MAC</label><br>
+        <input type="text" name="mac" placeholder="00:0c:29:2f:9d:fa" required value="{{if .Client}}{{.Client.MAC}}{{end}}">
+    </p>
+
+    <p>
+        <label>Hostname</label><br>
+        <input type="text" name="hostname" value="{{if .Client}}{{.Client.Hostname}}{{end}}">
+    </p>
+
+    <p>
+        <label>Profile</label><br>
+        <select name="profile_id">
+            {{range .Profiles}}
+            <option value="{{.ID}}" {{if and $.Client (eq $.Client.ProfileID .ID)}}selected{{end}}>{{.Name}}</option>
+            {{end}}
+        </select>
+    </p>
+
+    <p>
+        <label><input type="checkbox" name="show_menu" {{if and .Client .Client.ShowMenu}}checked{{end}}> Show menu instead of direct boot</label>
+    </p>
+
+    <p>
+        <label>Description</label><br>
+        <input type="text" name="description" style="width: 500px" value="{{if .Client}}{{.Client.Description}}{{end}}">
+    </p>
+
+    <p>
+        <button type="submit">{{if .IsEdit}}Save changes{{else}}Save{{end}}</button>
+    </p>
+</form>
+
+<p><a href="/admin/clients">Back</a></p>
+</body>
+</html>

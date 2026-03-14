@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Profiles</title>
+</head>
+<body>
+<h1>Profiles</h1>
+
+<p>
+    <a href="/">Dashboard</a> |
+    <a href="/admin/profiles/new">New profile</a> |
+    <a href="/admin/assets">Assets</a>
+</p>
+
+<form method="post" action="/admin/settings/default-profile">
+    <label>Default profile:</label>
+    <select name="profile_id">
+        {{range .Profiles}}
+        <option value="{{.ID}}" {{if eq $.DefaultProfileID .ID}}selected{{end}}>{{.Name}}</option>
+        {{end}}
+    </select>
+    <button type="submit">Set default</button>
+</form>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Mode</th>
+        <th>Boot Type</th>
+        <th>Kernel</th>
+        <th>Initrd</th>
+        <th>Image Path</th>
+        <th>Cmdline</th>
+        <th>Enabled</th>
+        <th>Action</th>
+    </tr>
+    {{range .Profiles}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.BootMode}}</td>
+        <td>{{.BootType}}</td>
+        <td>{{.Kernel}}</td>
+        <td>{{.Initrd}}</td>
+        <td>{{.ImagePath}}</td>
+        <td>{{.Cmdline}}</td>
+        <td>{{.Enabled}}</td>
+        <td>
+            <a href="/admin/profiles/edit?id={{.ID}}">Edit</a>
+            <form method="post" action="/admin/profiles/delete?id={{.ID}}" style="display:inline;" onsubmit="return confirm('Delete this profile?');">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

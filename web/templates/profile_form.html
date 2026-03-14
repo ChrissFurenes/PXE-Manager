@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{if .IsEdit}}Edit Profile{{else}}New Profile{{end}}</title>
+</head>
+<body>
+<h1>{{if .IsEdit}}Edit Profile{{else}}New Profile{{end}}</h1>
+
+<form method="post" action="{{if .IsEdit}}/admin/profiles/edit?id={{.Profile.ID}}{{else}}/admin/profiles/new{{end}}">
+    <p>
+        <label>Name</label><br>
+        <input type="text" name="name" required value="{{if .Profile}}{{.Profile.Name}}{{end}}">
+    </p>
+
+    <p>
+        <label>Boot mode</label><br>
+        <select name="boot_mode">
+            <option value="bios" {{if and .Profile (eq .Profile.BootMode "bios")}}selected{{end}}>bios</option>
+            <option value="uefi" {{if and .Profile (eq .Profile.BootMode "uefi")}}selected{{end}}>uefi</option>
+            <option value="both" {{if or (not .Profile) (eq .Profile.BootMode "both")}}selected{{end}}>both</option>
+        </select>
+    </p>
+
+    <p>
+        <label>Boot type</label><br>
+        <select name="boot_type">
+            <option value="kernel_initrd" {{if or (not .Profile) (eq .Profile.BootType "kernel_initrd")}}selected{{end}}>kernel_initrd</option>
+            <option value="iso" {{if and .Profile (eq .Profile.BootType "iso")}}selected{{end}}>iso</option>
+            <option value="sanboot" {{if and .Profile (eq .Profile.BootType "sanboot")}}selected{{end}}>sanboot</option>
+        </select>
+    </p>
+
+    <p>
+        <label>Kernel path</label><br>
+        <input type="text" name="kernel" placeholder="/ubuntu/vmlinuz" value="{{if .Profile}}{{.Profile.Kernel}}{{end}}">
+    </p>
+
+    <p>
+        <label>Initrd path</label><br>
+        <input type="text" name="initrd" placeholder="/ubuntu/initrd" value="{{if .Profile}}{{.Profile.Initrd}}{{end}}">
+    </p>
+
+    <p>
+        <label>Image path</label><br>
+        <input type="text" name="image_path" placeholder="/images/ubuntu-24.04.iso" value="{{if .Profile}}{{.Profile.ImagePath}}{{end}}">
+    </p>
+
+    <p>
+        <label>Or choose uploaded asset</label><br>
+        <select onchange="document.getElementsByName('image_path')[0].value=this.value;">
+            <option value="">-- select asset --</option>
+            {{range .Assets}}
+            <option value="{{.FilePath}}" {{if and $.Profile (eq $.Profile.ImagePath .FilePath)}}selected{{end}}>{{.Name}} ({{.FileType}})</option>
+            {{end}}
+        </select>
+    </p>
+
+    <p>
+        <label>Kernel cmdline</label><br>
+        <input type="text" name="cmdline" style="width: 700px" placeholder="ip=dhcp" value="{{if .Profile}}{{.Profile.Cmdline}}{{end}}">
+    </p>
+
+    <p>
+        <label><input type="checkbox" name="enabled" {{if or (not .Profile) .Profile.Enabled}}checked{{end}}> Enabled</label>
+    </p>
+
+    <p>
+        <button type="submit">{{if .IsEdit}}Save changes{{else}}Save{{end}}</button>
+    </p>
+</form>
+
+<p><a href="/admin/profiles">Back</a></p>
+</body>
+</html>

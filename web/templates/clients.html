@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Clients</title>
+</head>
+<body>
+<h1>Clients</h1>
+
+<p>
+    <a href="/">Dashboard</a> |
+    <a href="/admin/clients/new">New client</a> |
+    <a href="/admin/profiles">Profiles</a>
+</p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>MAC</th>
+        <th>Hostname</th>
+        <th>Profile ID</th>
+        <th>Show Menu</th>
+        <th>Description</th>
+        <th>Action</th>
+    </tr>
+    {{range .Clients}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.MAC}}</td>
+        <td>{{.Hostname}}</td>
+        <td>{{.ProfileID}}</td>
+        <td>{{.ShowMenu}}</td>
+        <td>{{.Description}}</td>
+        <td>
+            <a href="/admin/clients/edit?id={{.ID}}">Edit</a>
+            <form method="post" action="/admin/clients/delete?id={{.ID}}" style="display:inline;" onsubmit="return confirm('Delete this client?');">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

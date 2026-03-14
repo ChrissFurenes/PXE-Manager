@@ -1,0 +1,13 @@
+server_ip: "10.230.0.212"
+
+tftp:
+  listen_addr: ":69"
+  root_dir: "./pxe/tftp"
+
+http:
+  listen_addr: ":8080"
+  root_dir: "./pxe/http"
+  template_dir: "./web/templates"
+
+database:
+  path: "./pxe-manager.db"

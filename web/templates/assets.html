@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Assets</title>
+</head>
+<body>
+<h1>Assets</h1>
+
+<p>
+    <a href="/">Dashboard</a> |
+    <a href="/admin/assets/new">Upload asset</a> |
+    <a href="/admin/profiles">Profiles</a>
+</p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>File Name</th>
+        <th>Type</th>
+        <th>Path</th>
+        <th>Size</th>
+        <th>Description</th>
+        <th>Action</th>
+    </tr>
+    {{range .Assets}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.FileName}}</td>
+        <td>{{.FileType}}</td>
+        <td>{{.FilePath}}</td>
+        <td>{{.SizeBytes}}</td>
+        <td>{{.Description}}</td>
+        <td>
+            <a href="/admin/assets/edit?id={{.ID}}">Edit</a>
+            <form method="post" action="/admin/assets/delete?id={{.ID}}" style="display:inline;" onsubmit="return confirm('Delete this asset?');">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

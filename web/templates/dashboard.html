@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>PXE Manager</title>
+</head>
+<body>
+<h1>PXE Manager</h1>
+
+<p>
+    <a href="/admin/profiles">Profiles</a> |
+    <a href="/admin/clients">Clients</a> |
+    <a href="/admin/assets">Assets</a>
+</p>
+
+<h2>Dashboard</h2>
+<p>Profiles: {{.ProfilesCount}}</p>
+<p>Clients: {{.ClientsCount}}</p>
+<p>Assets: {{.AssetsCount}}</p>
+<p>Default profile ID: {{.DefaultProfileID}}</p>
+</body>
+</html>
