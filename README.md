@@ -14,12 +14,12 @@ Web UI runs on port ``:8080``
 
 
 ## ideas and planing
--[X] Does have a web UI
--[X] Can select image on boot
--[ ] Making web UI fancy
--[ ] Adding support for env
--[ ] Withe list
--[ ] Block list
--[ ] Password auth to boot from image
--[ ] Support for talos config files (worker/controlplane)
--[ ] support for cloud-init
+- [X] Does have a web UI
+- [X] Can select image on boot
+- [ ] Making web UI fancy
+- [ ] Adding support for env
+- [ ] Withe list
+- [ ] Block list
+- [ ] Password auth to boot from image
+- [ ] Support for talos config files (worker/controlplane)
+- [ ] support for cloud-init
