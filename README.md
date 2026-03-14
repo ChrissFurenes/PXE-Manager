@@ -16,6 +16,7 @@ Web UI runs on port ``:8080``
 ## ideas and planing
 - [X] Does have a web UI
 - [X] Can select image on boot
+- [ ] Making so iso boot works 100%
 - [ ] Making web UI fancy
 - [ ] Adding support for env
 - [ ] Withe list
