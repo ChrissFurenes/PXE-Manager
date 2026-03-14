@@ -1,3 +1,4 @@
 .idea
 pxe-manager.db
-pxe/http/images/*
+pxe/http/images/*.img
+pxe/http/images/*.iso
