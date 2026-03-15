@@ -43,9 +43,11 @@ func (s *Store) init() error {
 			mac TEXT NOT NULL UNIQUE,
 			hostname TEXT NOT NULL,
 			profile_id INTEGER,
+			config_id INTEGER,
 			show_menu INTEGER NOT NULL DEFAULT 0,
 			description TEXT NOT NULL DEFAULT '',
-			FOREIGN KEY(profile_id) REFERENCES profiles(id)
+			FOREIGN KEY(profile_id) REFERENCES profiles(id),
+    		FOREIGN KEY(config_id) REFERENCES talos(id)
 		);`,
 		`CREATE TABLE IF NOT EXISTS settings (
 			key TEXT PRIMARY KEY,
@@ -59,6 +61,14 @@ func (s *Store) init() error {
 			file_type TEXT NOT NULL,
 			size_bytes INTEGER NOT NULL DEFAULT 0,
 			description TEXT NOT NULL DEFAULT ''
+		);`,
+		`CREATE TABLE IF NOT EXISTS talos (
+    		id INTEGER PRIMARY KEY AUTOINCREMENT,
+    		name TEXT NOT NULL,
+    		file_name TEXT NOT NULL,
+    		file_path TEXT NOT NULL,
+    		size_bytes INTEGER NOT NULL DEFAULT 0,
+    		description TEXT NOT NULL DEFAULT ''
 		);`,
 	}
 
@@ -146,7 +156,7 @@ func (s *Store) DeleteProfile(id int64) error {
 }
 
 func (s *Store) ListClients() ([]Client, error) {
-	rows, err := s.DB.Query(`SELECT id, mac, hostname, profile_id, show_menu, description FROM clients ORDER BY id`)
+	rows, err := s.DB.Query(`SELECT id, mac, hostname, profile_id, config_id, show_menu, description FROM clients ORDER BY id`)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +166,7 @@ func (s *Store) ListClients() ([]Client, error) {
 	for rows.Next() {
 		var c Client
 		var show int
-		if err := rows.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &show, &c.Description); err != nil {
+		if err := rows.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &c.ConfigID, &show, &c.Description); err != nil {
 			return nil, err
 		}
 		c.ShowMenu = show == 1
@@ -166,11 +176,11 @@ func (s *Store) ListClients() ([]Client, error) {
 }
 
 func (s *Store) GetClient(id int64) (*Client, error) {
-	row := s.DB.QueryRow(`SELECT id, mac, hostname, profile_id, show_menu, description FROM clients WHERE id = ?`, id)
+	row := s.DB.QueryRow(`SELECT id, mac, hostname, profile_id, config_id, show_menu, description FROM clients WHERE id = ?`, id)
 
 	var c Client
 	var show int
-	if err := row.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &show, &c.Description); err != nil {
+	if err := row.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &c.ConfigID, &show, &c.Description); err != nil {
 		return nil, err
 	}
 	c.ShowMenu = show == 1
@@ -178,11 +188,11 @@ func (s *Store) GetClient(id int64) (*Client, error) {
 }
 
 func (s *Store) GetClientByMAC(mac string) (*Client, error) {
-	row := s.DB.QueryRow(`SELECT id, mac, hostname, profile_id, show_menu, description FROM clients WHERE lower(mac) = lower(?)`, mac)
+	row := s.DB.QueryRow(`SELECT id, mac, hostname, profile_id, config_id, show_menu, description FROM clients WHERE lower(mac) = lower(?)`, mac)
 
 	var c Client
 	var show int
-	if err := row.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &show, &c.Description); err != nil {
+	if err := row.Scan(&c.ID, &c.MAC, &c.Hostname, &c.ProfileID, &c.ConfigID, &show, &c.Description); err != nil {
 		return nil, err
 	}
 	c.ShowMenu = show == 1
@@ -196,8 +206,8 @@ func (s *Store) CreateClient(c *Client) error {
 	}
 
 	res, err := s.DB.Exec(
-		`INSERT INTO clients (mac, hostname, profile_id, show_menu, description) VALUES (?, ?, ?, ?, ?)`,
-		c.MAC, c.Hostname, c.ProfileID, show, c.Description,
+		`INSERT INTO clients (mac, hostname, profile_id, config_id, show_menu, description) VALUES (?, ?, ?, ?, ?)`,
+		c.MAC, c.Hostname, c.ProfileID, c.ConfigID, show, c.Description,
 	)
 	if err != nil {
 		return err
@@ -214,9 +224,9 @@ func (s *Store) UpdateClient(c *Client) error {
 
 	_, err := s.DB.Exec(
 		`UPDATE clients
-		 SET mac = ?, hostname = ?, profile_id = ?, show_menu = ?, description = ?
+		 SET mac = ?, hostname = ?, profile_id = ?, config_id = ?, show_menu = ?, description = ?
 		 WHERE id = ?`,
-		c.MAC, c.Hostname, c.ProfileID, show, c.Description, c.ID,
+		c.MAC, c.Hostname, c.ProfileID, c.ConfigID, show, c.Description, c.ID,
 	)
 	return err
 }
@@ -297,5 +307,60 @@ func (s *Store) UpdateAsset(a *Asset) error {
 
 func (s *Store) DeleteAsset(id int64) error {
 	_, err := s.DB.Exec(`DELETE FROM assets WHERE id = ?`, id)
+	return err
+}
+
+func (s *Store) ListTalos() ([]Talos, error) {
+	rows, err := s.DB.Query(`SELECT id, name, file_name, file_path, size_bytes, description FROM talos ORDER BY id`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []Talos
+	for rows.Next() {
+		var c Talos
+		if err := rows.Scan(&c.ID, &c.Name, &c.FileName, &c.FilePath, &c.SizeBytes, &c.Description); err != nil {
+			return nil, err
+		}
+
+		out = append(out, c)
+	}
+	return out, rows.Err()
+}
+func (s *Store) CreateTalos(a *Talos) error {
+
+	res, err := s.DB.Exec(
+		`INSERT INTO talos (name, file_name, file_path, size_bytes, description)
+		 VALUES (?, ?, ?, ?, ?)`,
+		a.Name, a.FileName, a.FilePath, a.SizeBytes, a.Description,
+	)
+	if err != nil {
+		return err
+	}
+	a.ID, _ = res.LastInsertId()
+	return nil
+}
+func (s *Store) GetTalos(id int64) (*Talos, error) {
+	row := s.DB.QueryRow(`SELECT id, name, file_name, file_path, size_bytes, description FROM talos WHERE id = ?`, id)
+
+	var a Talos
+	if err := row.Scan(&a.ID, &a.Name, &a.FileName, &a.FilePath, &a.SizeBytes, &a.Description); err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+func (s *Store) UpdateTalos(a *Talos) error {
+	_, err := s.DB.Exec(
+		`UPDATE talos
+		 SET name = ?, description = ?
+		 WHERE id = ?`,
+		a.Name, a.Description, a.ID,
+	)
+	return err
+}
+
+func (s *Store) DeleteTalos(id int64) error {
+	_, err := s.DB.Exec(`DELETE FROM talos WHERE id = ?`, id)
 	return err
 }

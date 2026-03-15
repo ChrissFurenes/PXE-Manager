@@ -1,0 +1,3 @@
+#!ipxe
+dhcp
+sanboot http://10.230.0.212:8080/files/images/ubuntu-24.04.4-live-server-amd64.iso

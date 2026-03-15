@@ -27,7 +27,17 @@ type Client struct {
 	MAC         string
 	Hostname    string
 	ProfileID   int64
+	ConfigID    int64
 	ShowMenu    bool
+	Description string
+}
+
+type Talos struct {
+	ID          int64
+	Name        string
+	FileName    string
+	FilePath    string
+	SizeBytes   int64
 	Description string
 }
 

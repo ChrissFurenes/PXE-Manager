@@ -165,9 +165,11 @@ func (h *Handler) Clients(c *gin.Context) {
 
 func (h *Handler) NewClientForm(c *gin.Context) {
 	profiles, _ := h.store.ListProfiles()
+	configs, _ := h.store.ListTalos()
 
 	c.HTML(http.StatusOK, "client_form.html", gin.H{
 		"Profiles": profiles,
+		"Configs":  configs,
 		"Client":   nil,
 		"IsEdit":   false,
 	})
@@ -176,11 +178,13 @@ func (h *Handler) NewClientForm(c *gin.Context) {
 func (h *Handler) NewClient(c *gin.Context) {
 	showMenu := c.PostForm("show_menu") == "on"
 	profileID, _ := strconv.ParseInt(c.PostForm("profile_id"), 10, 64)
+	configID, _ := strconv.ParseInt(c.PostForm("config_id"), 10, 64)
 
 	client := &storage.Client{
 		MAC:         strings.TrimSpace(strings.ToLower(c.PostForm("mac"))),
 		Hostname:    strings.TrimSpace(c.PostForm("hostname")),
 		ProfileID:   profileID,
+		ConfigID:    configID,
 		ShowMenu:    showMenu,
 		Description: strings.TrimSpace(c.PostForm("description")),
 	}
@@ -207,9 +211,11 @@ func (h *Handler) EditClientForm(c *gin.Context) {
 	}
 
 	profiles, _ := h.store.ListProfiles()
+	configs, _ := h.store.ListTalos()
 
 	c.HTML(http.StatusOK, "client_form.html", gin.H{
 		"Profiles": profiles,
+		"Configs":  configs,
 		"Client":   client,
 		"IsEdit":   true,
 	})
@@ -224,12 +230,14 @@ func (h *Handler) EditClient(c *gin.Context) {
 
 	showMenu := c.PostForm("show_menu") == "on"
 	profileID, _ := strconv.ParseInt(c.PostForm("profile_id"), 10, 64)
+	configID, _ := strconv.ParseInt(c.PostForm("config_id"), 10, 64)
 
 	client := &storage.Client{
 		ID:          id,
 		MAC:         strings.TrimSpace(strings.ToLower(c.PostForm("mac"))),
 		Hostname:    strings.TrimSpace(c.PostForm("hostname")),
 		ProfileID:   profileID,
+		ConfigID:    configID,
 		ShowMenu:    showMenu,
 		Description: strings.TrimSpace(c.PostForm("description")),
 	}
@@ -291,13 +299,13 @@ func (h *Handler) NewAsset(c *gin.Context) {
 		name = file.Filename
 	}
 
-	if err := os.MkdirAll(h.uploadDir, 0o755); err != nil {
+	if err := os.MkdirAll(h.uploadDir+"/images", 0o755); err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	safeName := filepath.Base(file.Filename)
-	dstPath := filepath.Join(h.uploadDir, safeName)
+	dstPath := filepath.Join(h.uploadDir+"/images", safeName)
 
 	if err := c.SaveUploadedFile(file, dstPath); err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
@@ -390,4 +398,118 @@ func (h *Handler) SetDefaultProfile(c *gin.Context) {
 	}
 
 	c.Redirect(http.StatusSeeOther, "/admin/profiles/")
+}
+func (h *Handler) Talos(c *gin.Context) {
+	talos, err := h.store.ListTalos()
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.HTML(http.StatusOK, "talos.html", gin.H{
+		"Talos": talos,
+	})
+}
+func (h *Handler) NewTalosForm(c *gin.Context) {
+	c.HTML(http.StatusOK, "talos_form.html", gin.H{
+		"Talos":  nil,
+		"IsEdit": false,
+	})
+}
+
+func (h *Handler) NewTalos(c *gin.Context) {
+	name := strings.TrimSpace(c.PostForm("name"))
+	description := strings.TrimSpace(c.PostForm("description"))
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if name == "" {
+		name = file.Filename
+	}
+
+	if err := os.MkdirAll(h.uploadDir+"/talos", 0o755); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	safeName := filepath.Base(file.Filename)
+	dstPath := filepath.Join(h.uploadDir+"/talos", safeName)
+
+	if err := c.SaveUploadedFile(file, dstPath); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	talos := &storage.Talos{
+		Name:        name,
+		FileName:    safeName,
+		FilePath:    "/talos/" + safeName,
+		SizeBytes:   file.Size,
+		Description: description,
+	}
+
+	if err := h.store.CreateTalos(talos); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/admin/talos/")
+}
+func (h *Handler) EditTalosForm(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	if err != nil || id <= 0 {
+		c.String(http.StatusBadRequest, "invalid talos id")
+		return
+	}
+
+	talos, err := h.store.GetTalos(id)
+	if err != nil {
+		c.String(http.StatusNotFound, err.Error())
+		return
+	}
+
+	c.HTML(http.StatusOK, "talos_form.html", gin.H{
+		"Talos":  talos,
+		"IsEdit": true,
+	})
+}
+
+func (h *Handler) EditTalos(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	if err != nil || id <= 0 {
+		c.String(http.StatusBadRequest, "invalid talos id")
+		return
+	}
+
+	talos := &storage.Talos{
+		ID:          id,
+		Name:        strings.TrimSpace(c.PostForm("name")),
+		FilePath:    strings.TrimSpace(c.PostForm("file_path")),
+		Description: strings.TrimSpace(c.PostForm("description")),
+	}
+
+	if err := h.store.UpdateTalos(talos); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/admin/talos/")
+}
+func (h *Handler) DeleteTalos(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	if err != nil || id <= 0 {
+		c.String(http.StatusBadRequest, "invalid talos id")
+		return
+	}
+
+	if err := h.store.DeleteTalos(id); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/admin/talos/")
 }

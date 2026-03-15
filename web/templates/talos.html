@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Talos</title>
+</head>
+<body>
+<h1>Talos</h1>
+
+<p>
+    <a href="/">Dashboard</a> |
+    <a href="/admin/talos/new">New Talos Config</a> |
+    <a href="/admin/profiles">Profiles</a>
+</p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>File Name</th>
+        <th>Description</th>
+        <th>Action</th>
+    </tr>
+    {{range .Talos}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.FileName}}</td>
+        <td>{{.Description}}</td>
+        <td>
+            <a href="/admin/talos/edit?id={{.ID}}">Edit</a>
+            <form method="post" action="/admin/talos/delete?id={{.ID}}" style="display:inline;" onsubmit="return confirm('Delete this talos config?');">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

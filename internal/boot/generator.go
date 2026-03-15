@@ -2,7 +2,6 @@ package boot
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"PXE-Manager/internal/storage"
@@ -67,7 +66,6 @@ func GenerateMenuScript(serverBase string, profiles []storage.Profile) string {
 }
 
 func generateProfileEntry(serverBase string, profile storage.Profile) string {
-	log.Printf("LOLLLLOOOOLLOOLL")
 	switch profile.BootType {
 	case "kernel_initrd":
 		return fmt.Sprintf("kernel test%s%s %s\ninitrd %s%s\nboot\n",

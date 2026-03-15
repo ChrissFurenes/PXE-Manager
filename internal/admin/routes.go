@@ -36,6 +36,15 @@ func RegisterRoutes(router *gin.Engine, h *Handler) {
 			assets.POST("/edit", h.EditAsset)
 			assets.POST("/delete", h.DeleteAsset)
 		}
+		talos := admin.Group("/talos")
+		{
+			talos.GET("/", h.Talos)
+			talos.GET("/new", h.NewTalosForm)
+			talos.POST("/new", h.NewTalos)
+			talos.GET("/edit", h.EditTalosForm)
+			talos.POST("/edit", h.EditTalos)
+			talos.POST("/delete", h.DeleteTalos)
+		}
 		router.GET("/", h.Dashboard)
 	}
 

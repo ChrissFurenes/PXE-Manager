@@ -7,7 +7,8 @@ when testing sett default boot file in dhcp server to ``undionly.kpxe``
 remember to change ip in ``config.yaml``
 
 ## some links
-[Github ipxe](https://github.com/ipxe/ipxe)
+* [Github ipxe](https://github.com/ipxe/ipxe)
+* [IPXE commands](https://ipxe.org/cmd)
 
 ## Status
 some stuff work.
@@ -15,6 +16,10 @@ you ich boot from selected os.
 
 Web UI runs on port ``:8080``
 
+## Talos info
+to boot talos with config add this to ``Kernel cmdline``:
+
+```talos.platform=metal slab_nomerge pti=on ip=eth0:dhcp talos.config=http://10.230.0.212:8080/files/talos/worker.yaml```
 
 ## ideas and planing
 - [X] Does have a web UI

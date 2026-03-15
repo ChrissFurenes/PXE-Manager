@@ -21,12 +21,23 @@
     <p>
         <label>Profile</label><br>
         <select name="profile_id">
+            <option value="0">-Select-</option>
             {{range .Profiles}}
+
             <option value="{{.ID}}" {{if and $.Client (eq $.Client.ProfileID .ID)}}selected{{end}}>{{.Name}}</option>
             {{end}}
         </select>
     </p>
+    <p>
+        <label>Config</label><br>
+        <select name="config_id">
+            <option value="0">-Select-</option>
+            {{range .Configs}}
 
+            <option value="{{.ID}}" {{if and $.Client (eq $.Client.ConfigID .ID)}}selected{{end}}>{{.Name}}</option>
+            {{end}}
+        </select>
+    </p>
     <p>
         <label><input type="checkbox" name="show_menu" {{if and .Client .Client.ShowMenu}}checked{{end}}> Show menu instead of direct boot</label>
     </p>

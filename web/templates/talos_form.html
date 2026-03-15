@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{if .IsEdit}}Edit Talos{{else}}New Talos{{end}}</title>
+</head>
+<body>
+<h1>{{if .IsEdit}}Edit Talos{{else}}New Talos{{end}}</h1>
+
+<form method="post" action="{{if .IsEdit}}/admin/talos/edit?id={{.Talos.ID}}{{else}}/admin/talos/new{{end}}"{{if not .IsEdit}}enctype="multipart/form-data"{{end}}>
+    <p>
+        <label>Name</label><br>
+        <input type="text" name="name" placeholder="Worker" required value="{{if .Talos}}{{.Talos.Name}}{{end}}">
+    </p>
+
+
+
+    <p>
+        <label>Description</label><br>
+        <input type="text" name="description" style="width: 500px" value="{{if .Talos}}{{.Talos.Description}}{{end}}">
+    </p>
+
+
+    {{if not .IsEdit}}
+    <p>
+        <label>File</label><br>
+        <input type="file" name="file" required>
+    </p>
+    {{else}}
+    <p>
+        <strong>File:</strong> {{.Talos.FileName}}<br>
+        <strong>Path:</strong> {{.Talos.FilePath}}<br>
+        <strong>Size:</strong> {{.Talos.SizeBytes}}
+    </p>
+    {{end}}
+    <p>
+        <button type="submit">{{if .IsEdit}}Save changes{{else}}Upload{{end}}</button>
+    </p>
+</form>
+
+<p><a href="/admin/talos">Back</a></p>
+</body>
+</html>

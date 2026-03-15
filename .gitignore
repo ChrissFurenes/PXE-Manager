@@ -1,4 +1,6 @@
 .idea
 pxe-manager.db
+*.db
 pxe/http/images/*.img
 pxe/http/images/*.iso
+pxe/http/images/*.yaml

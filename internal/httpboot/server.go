@@ -23,7 +23,7 @@ func Start(cfg *config.Config, store *storage.Store) error {
 
 	router.LoadHTMLGlob(filepath.Join(cfg.HTTP.TemplateDir, "*.html"))
 
-	uploadDir := filepath.Join(cfg.HTTP.RootDir, "images")
+	uploadDir := filepath.Join(cfg.HTTP.RootDir, "")
 
 	adminHandler := admin.NewHandler(store, uploadDir)
 	admin.RegisterRoutes(router, adminHandler)
