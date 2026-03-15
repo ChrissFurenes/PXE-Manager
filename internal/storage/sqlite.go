@@ -206,7 +206,7 @@ func (s *Store) CreateClient(c *Client) error {
 	}
 
 	res, err := s.DB.Exec(
-		`INSERT INTO clients (mac, hostname, profile_id, config_id, show_menu, description) VALUES (?, ?, ?, ?, ?)`,
+		`INSERT INTO clients (mac, hostname, profile_id, config_id, show_menu, description) VALUES (?, ?, ?, ?, ?, ?)`,
 		c.MAC, c.Hostname, c.ProfileID, c.ConfigID, show, c.Description,
 	)
 	if err != nil {
