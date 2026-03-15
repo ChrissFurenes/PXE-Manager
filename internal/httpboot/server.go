@@ -2,7 +2,6 @@ package httpboot
 
 import (
 	"log"
-	"net/http"
 	"path/filepath"
 	"strings"
 
@@ -10,6 +9,8 @@ import (
 	"PXE-Manager/internal/boot"
 	"PXE-Manager/internal/config"
 	"PXE-Manager/internal/storage"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
@@ -18,36 +19,30 @@ type Server struct {
 }
 
 func Start(cfg *config.Config, store *storage.Store) error {
-	mux := http.NewServeMux()
+	router := gin.Default()
 
-	tmpl, err := admin.NewTemplateManager(cfg.HTTP.TemplateDir)
-	if err != nil {
-		return err
-	}
+	router.LoadHTMLGlob(filepath.Join(cfg.HTTP.TemplateDir, "*.html"))
 
 	uploadDir := filepath.Join(cfg.HTTP.RootDir, "images")
-	adminHandler := admin.NewHandler(store, tmpl, uploadDir)
-	admin.RegisterRoutes(mux, adminHandler)
+
+	adminHandler := admin.NewHandler(store, uploadDir)
+	admin.RegisterRoutes(router, adminHandler)
 
 	s := &Server{
 		cfg:   cfg,
 		store: store,
 	}
 
-	mux.HandleFunc("/boot.ipxe", s.bootHandler)
-
-	fs := http.FileServer(http.Dir(cfg.HTTP.RootDir))
-	mux.Handle("/files/", http.StripPrefix("/files/", fs))
+	router.GET("/boot.ipxe", s.bootHandler)
+	router.Static("/files", cfg.HTTP.RootDir)
 
 	log.Printf("[HTTP] listening on %s", cfg.HTTP.ListenAddr)
-	return http.ListenAndServe(cfg.HTTP.ListenAddr, mux)
+	return router.Run(cfg.HTTP.ListenAddr)
 }
 
-func (s *Server) bootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-
+func (s *Server) bootHandler(c *gin.Context) {
 	serverBase := "http://" + s.cfg.ServerIP + s.cfg.HTTP.ListenAddr + "/files"
-	mac := strings.TrimSpace(strings.ToLower(r.URL.Query().Get("mac")))
+	mac := strings.TrimSpace(strings.ToLower(c.Query("mac")))
 
 	if mac != "" {
 		client, err := s.store.GetClientByMAC(mac)
@@ -55,17 +50,16 @@ func (s *Server) bootHandler(w http.ResponseWriter, r *http.Request) {
 			if client.ShowMenu {
 				profiles, err := s.store.ListProfiles()
 				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
+					c.String(500, err.Error())
 					return
 				}
-
-				_, _ = w.Write([]byte(boot.GenerateMenuScript(serverBase, profiles)))
+				c.Data(200, "text/plain; charset=utf-8", []byte(boot.GenerateMenuScript(serverBase, profiles)))
 				return
 			}
 
 			profile, err := s.store.GetProfile(client.ProfileID)
 			if err == nil && profile.Enabled {
-				_, _ = w.Write([]byte(boot.GenerateBootScript(serverBase, *profile)))
+				c.Data(200, "text/plain; charset=utf-8", []byte(boot.GenerateBootScript(serverBase, *profile)))
 				return
 			}
 		}
@@ -75,16 +69,16 @@ func (s *Server) bootHandler(w http.ResponseWriter, r *http.Request) {
 	if err == nil && defaultID > 0 {
 		profile, err := s.store.GetProfile(defaultID)
 		if err == nil && profile.Enabled {
-			_, _ = w.Write([]byte(boot.GenerateBootScript(serverBase, *profile)))
+			c.Data(200, "text/plain; charset=utf-8", []byte(boot.GenerateBootScript(serverBase, *profile)))
 			return
 		}
 	}
 
 	profiles, err := s.store.ListProfiles()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		c.String(500, err.Error())
 		return
 	}
 
-	_, _ = w.Write([]byte(boot.GenerateMenuScript(serverBase, profiles)))
+	c.Data(200, "text/plain; charset=utf-8", []byte(boot.GenerateMenuScript(serverBase, profiles)))
 }

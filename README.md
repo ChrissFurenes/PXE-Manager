@@ -6,6 +6,9 @@
 when testing sett default boot file in dhcp server to ``undionly.kpxe``
 remember to change ip in ``config.yaml``
 
+## some links
+[Github ipxe](https://github.com/ipxe/ipxe)
+
 ## Status
 some stuff work.
 you ich boot from selected os.

@@ -1,24 +1,42 @@
 package admin
 
-import "net/http"
+import "github.com/gin-gonic/gin"
 
-func RegisterRoutes(mux *http.ServeMux, h *Handler) {
-	mux.HandleFunc("/", h.Dashboard)
+func RegisterRoutes(router *gin.Engine, h *Handler) {
 
-	mux.HandleFunc("/admin/profiles", h.Profiles)
-	mux.HandleFunc("/admin/profiles/new", h.NewProfile)
-	mux.HandleFunc("/admin/profiles/edit", h.EditProfile)
-	mux.HandleFunc("/admin/profiles/delete", h.DeleteProfile)
+	admin := router.Group("/admin")
+	{
 
-	mux.HandleFunc("/admin/clients", h.Clients)
-	mux.HandleFunc("/admin/clients/new", h.NewClient)
-	mux.HandleFunc("/admin/clients/edit", h.EditClient)
-	mux.HandleFunc("/admin/clients/delete", h.DeleteClient)
+		profiles := admin.Group("/profiles")
+		{
+			profiles.GET("/", h.Profiles)
+			profiles.GET("/new", h.NewProfileForm)
+			profiles.POST("/new", h.NewProfile)
+			profiles.GET("/edit", h.EditProfileForm)
+			profiles.POST("/edit", h.EditProfile)
+			profiles.POST("/delete", h.DeleteProfile)
+		}
 
-	mux.HandleFunc("/admin/assets", h.Assets)
-	mux.HandleFunc("/admin/assets/new", h.NewAsset)
-	mux.HandleFunc("/admin/assets/edit", h.EditAsset)
-	mux.HandleFunc("/admin/assets/delete", h.DeleteAsset)
+		clients := admin.Group("/clients")
+		{
+			clients.GET("/", h.Clients)
+			clients.GET("/new", h.NewClientForm)
+			clients.POST("/new", h.NewClient)
+			clients.GET("/edit", h.EditClientForm)
+			clients.POST("/edit", h.EditClient)
+			clients.POST("/delete", h.DeleteClient)
+		}
 
-	mux.HandleFunc("/admin/settings/default-profile", h.SetDefaultProfile)
+		assets := admin.Group("/assets")
+		{
+			assets.GET("/", h.Assets)
+			assets.GET("/new", h.NewAssetForm)
+			assets.POST("/new", h.NewAsset)
+			assets.GET("/edit", h.EditAssetForm)
+			assets.POST("/edit", h.EditAsset)
+			assets.POST("/delete", h.DeleteAsset)
+		}
+		router.GET("/", h.Dashboard)
+	}
+
 }
