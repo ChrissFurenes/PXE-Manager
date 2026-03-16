@@ -9,6 +9,11 @@ remember to change ip in ``config.yaml``
 ## some links
 * [Github ipxe](https://github.com/ipxe/ipxe)
 * [IPXE commands](https://ipxe.org/cmd)
+* [Talos PXE](https://docs.siderolabs.com/talos/v1.12/platform-specific-installations/bare-metal-platforms/pxe)
+* [Ubuntu netboot](https://ubuntu.com/server/docs/how-to/installation/netboot-the-server-installer-via-uefi-pxe-on-arm-aarch64-arm64-and-x86-64-amd64/)
+* [Debian](https://wiki.debian.org/DebianInstaller/NetbootAssistant)
+
+
 
 ## Status
 some stuff work.
@@ -16,6 +21,14 @@ you ich boot from selected os.
 
 Web UI runs on port ``:8080``
 
+## How to run it
+Clone repo and run with go
+
+``git clone https://github.com/ChrissFurenes/PXE-Manager.git``
+
+``cd PXE-Manager``
+
+``sudo go run cmd/pxe-server/main.go``
 ## Talos info
 to boot talos with config add this to ``Kernel cmdline``:
 
