@@ -1,4 +1,4 @@
-# PXE-Manager
+# Pingu PX 
 
 ## ⚠️**Under development!!!**
 
@@ -12,6 +12,10 @@ remember to change ip in ``config.yaml``
 * [Talos PXE](https://docs.siderolabs.com/talos/v1.12/platform-specific-installations/bare-metal-platforms/pxe)
 * [Ubuntu netboot](https://ubuntu.com/server/docs/how-to/installation/netboot-the-server-installer-via-uefi-pxe-on-arm-aarch64-arm64-and-x86-64-amd64/)
 * [Debian](https://wiki.debian.org/DebianInstaller/NetbootAssistant)
+* [Proxmox](https://forum.proxmox.com/threads/automated-installation-pxe-boot.169009/)
+* [Proxmox1](https://forum.proxmox.com/threads/install-proxmox-host-via-pxe.108281/)
+* [ESXI](https://techdocs.broadcom.com/us/en/vmware-cis/vsphere/vsphere/8-0/esx-upgrade/upgrading-esxi-hosts-upgrade/how-to-boot-an-esxi-host-from-a-network-device-upgrade/boot-the-esxi-installer-by-using-pxe-and-tftp-upgrade.html)
+* [UNIFI OS](https://help.ui.com/hc/en-us/articles/34210126298775-Self-Hosting-UniFi)
 
 
 
